@@ -1,0 +1,13 @@
+{
+  "name": "nasuton-analytics-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "ナストンのアクセス解析ダッシュボード",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "start": "node scripts/serve.mjs",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" }
+}

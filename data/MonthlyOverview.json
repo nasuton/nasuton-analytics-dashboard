@@ -1,0 +1,205 @@
+[
+  {
+    "MonthYear": "2024-04",
+    "ActiveUsers": 597,
+    "ScreenPageViews": 784,
+    "NewUsers": 595,
+    "EngagementRate": 0.569620
+  },
+  {
+    "MonthYear": "2024-05",
+    "ActiveUsers": 1259,
+    "ScreenPageViews": 2127,
+    "NewUsers": 1241,
+    "EngagementRate": 0.567155
+  },
+  {
+    "MonthYear": "2024-06",
+    "ActiveUsers": 1266,
+    "ScreenPageViews": 1741,
+    "NewUsers": 1238,
+    "EngagementRate": 0.518167
+  },
+  {
+    "MonthYear": "2024-07",
+    "ActiveUsers": 1364,
+    "ScreenPageViews": 1936,
+    "NewUsers": 1328,
+    "EngagementRate": 0.533970
+  },
+  {
+    "MonthYear": "2024-08",
+    "ActiveUsers": 1212,
+    "ScreenPageViews": 1670,
+    "NewUsers": 1175,
+    "EngagementRate": 0.504167
+  },
+  {
+    "MonthYear": "2024-09",
+    "ActiveUsers": 1185,
+    "ScreenPageViews": 1645,
+    "NewUsers": 1151,
+    "EngagementRate": 0.528233
+  },
+  {
+    "MonthYear": "2024-10",
+    "ActiveUsers": 1428,
+    "ScreenPageViews": 2259,
+    "NewUsers": 1393,
+    "EngagementRate": 0.513541
+  },
+  {
+    "MonthYear": "2024-11",
+    "ActiveUsers": 1422,
+    "ScreenPageViews": 1934,
+    "NewUsers": 1387,
+    "EngagementRate": 0.505970
+  },
+  {
+    "MonthYear": "2024-12",
+    "ActiveUsers": 1635,
+    "ScreenPageViews": 2297,
+    "NewUsers": 1581,
+    "EngagementRate": 0.516340
+  },
+  {
+    "MonthYear": "2025-01",
+    "ActiveUsers": 1600,
+    "ScreenPageViews": 2211,
+    "NewUsers": 1554,
+    "EngagementRate": 0.510508
+  },
+  {
+    "MonthYear": "2025-02",
+    "ActiveUsers": 1598,
+    "ScreenPageViews": 2123,
+    "NewUsers": 1538,
+    "EngagementRate": 0.516712
+  },
+  {
+    "MonthYear": "2025-03",
+    "ActiveUsers": 1618,
+    "ScreenPageViews": 2159,
+    "NewUsers": 1559,
+    "EngagementRate": 0.510562
+  },
+  {
+    "MonthYear": "2025-04",
+    "ActiveUsers": 1780,
+    "ScreenPageViews": 2431,
+    "NewUsers": 1722,
+    "EngagementRate": 0.517750
+  },
+  {
+    "MonthYear": "2025-05",
+    "ActiveUsers": 1685,
+    "ScreenPageViews": 2361,
+    "NewUsers": 1628,
+    "EngagementRate": 0.517790
+  },
+  {
+    "MonthYear": "2025-06",
+    "ActiveUsers": 1470,
+    "ScreenPageViews": 2020,
+    "NewUsers": 1419,
+    "EngagementRate": 0.516098
+  },
+  {
+    "MonthYear": "2025-07",
+    "ActiveUsers": 1247,
+    "ScreenPageViews": 1758,
+    "NewUsers": 1202,
+    "EngagementRate": 0.514558
+  },
+  {
+    "MonthYear": "2025-08",
+    "ActiveUsers": 805,
+    "ScreenPageViews": 1120,
+    "NewUsers": 773,
+    "EngagementRate": 0.516379
+  },
+  {
+    "MonthYear": "2025-09",
+    "ActiveUsers": 890,
+    "ScreenPageViews": 1302,
+    "NewUsers": 867,
+    "EngagementRate": 0.497727
+  },
+  {
+    "MonthYear": "2025-10",
+    "ActiveUsers": 930,
+    "ScreenPageViews": 1295,
+    "NewUsers": 895,
+    "EngagementRate": 0.493902
+  },
+  {
+    "MonthYear": "2025-11",
+    "ActiveUsers": 832,
+    "ScreenPageViews": 1129,
+    "NewUsers": 815,
+    "EngagementRate": 0.511709
+  },
+  {
+    "MonthYear": "2025-12",
+    "ActiveUsers": 896,
+    "ScreenPageViews": 1214,
+    "NewUsers": 861,
+    "EngagementRate": 0.525493
+  },
+  {
+    "MonthYear": "2026-01",
+    "ActiveUsers": 852,
+    "ScreenPageViews": 1779,
+    "NewUsers": 825,
+    "EngagementRate": 0.526882
+  },
+  {
+    "MonthYear": "2026-02",
+    "ActiveUsers": 674,
+    "ScreenPageViews": 923,
+    "NewUsers": 645,
+    "EngagementRate": 0.508039
+  },
+  {
+    "MonthYear": "2026-03",
+    "ActiveUsers": 657,
+    "ScreenPageViews": 891,
+    "NewUsers": 639,
+    "EngagementRate": 0.497225
+  },
+  {
+    "MonthYear": "2026-04",
+    "ActiveUsers": 723,
+    "ScreenPageViews": 942,
+    "NewUsers": 706,
+    "EngagementRate": 0.483838
+  },
+  {
+    "MonthYear": "2026-05",
+    "ActiveUsers": 742,
+    "ScreenPageViews": 993,
+    "NewUsers": 723,
+    "EngagementRate": 0.498028
+  },
+  {
+    "MonthYear": "2026-06",
+    "ActiveUsers": 787,
+    "ScreenPageViews": 1115,
+    "NewUsers": 763,
+    "EngagementRate": 0.489202
+  },
+  {
+    "MonthYear": "2026-07",
+    "ActiveUsers": 1034,
+    "ScreenPageViews": 1300,
+    "NewUsers": 1001,
+    "EngagementRate": 0.371030
+  },
+  {
+    "MonthYear": "2026-08",
+    "ActiveUsers": 573,
+    "ScreenPageViews": 748,
+    "NewUsers": 551,
+    "EngagementRate": 0.473684
+  }
+]

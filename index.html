@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#175d52">
+  <meta name="description" content="ナストンのまとめの月間PV・ユーザー数・エンゲージメント率、セッション数、人気ページ・入口ページのアクセス解析。">
+  <title>ナストンのまとめ アクセス解析</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./css/style.css">
+  <script defer src="./vendor/chart.umd.min.js"></script>
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">コンテンツへ移動</a>
+  <header class="site-header">
+    <div class="brand"><img src="./favicon.svg" width="34" height="34" alt=""><span>ナストンのまとめ <span class="brand-sub">/ ANALYTICS</span></span></div>
+    <a class="site-link" href="https://nasuton.net/blog/" target="_blank" rel="noopener noreferrer">サイトを見る ↗</a>
+  </header>
+  <main id="main">
+    <section class="page-heading">
+      <div><p class="eyebrow">サイトのアクセス状況</p><h1>ナストンのまとめ アクセス解析</h1><p id="coverage" class="muted">データを読み込んでいます…</p></div>
+      <div class="filters" aria-label="表示期間">
+        <label>対象年<select id="year" disabled aria-label="対象年"></select></label>
+        <label>対象月<select id="month" disabled aria-label="対象月"></select></label>
+        <button id="reload" type="button" disabled>再読み込み</button>
+      </div>
+    </section>
+    <div id="status" class="notice" role="status" aria-live="polite">データを読み込んでいます…</div>
+    <noscript><p class="notice">表示するにはJavaScriptを有効にしてください。</p></noscript>
+    <section class="panel" aria-labelledby="overview-title">
+      <div class="panel-heading overview-heading">
+        <div><p class="eyebrow">MONTHLY OVERVIEW</p><h2 id="overview-title">月次サマリー</h2></div>
+        <label class="metric-picker">グラフの指標<select id="overview-metric" aria-label="月次サマリーの指標">
+          <option value="ScreenPageViews">総PV</option><option value="ActiveUsers">アクティブユーザー数</option>
+          <option value="NewUsers">新規ユーザー数</option><option value="EngagementRate">エンゲージメント率</option>
+        </select></label>
+      </div>
+      <div class="overview-cards" aria-label="選択月の全体指標">
+        <article><p>総PV</p><div id="overview-pv" class="metric-value">—</div><small>PV</small></article>
+        <article><p>アクティブユーザー数</p><div id="overview-active" class="metric-value">—</div><small>人</small></article>
+        <article><p>新規ユーザー数</p><div id="overview-new" class="metric-value">—</div><small>人</small></article>
+        <article><p>エンゲージメント率</p><div id="overview-rate" class="metric-value">—</div><small>エンゲージメントのあった訪問の割合</small></article>
+      </div>
+      <div class="panel-heading"><h3 id="overview-chart-title">月別 総PV</h3><span id="overview-unit" class="unit">PV</span></div>
+      <p id="overview-note" class="chart-note">棒を選ぶと、その月の詳細に切り替わります。人数は各月の値で、年間合計にはしません。</p>
+      <p id="overview-empty" class="empty" hidden></p>
+      <div class="chart-wrap"><canvas id="overview-chart" role="img" aria-label="選択指標の月別推移。数値は下のデータ表で確認できます。"></canvas></div>
+      <details><summary>月次サマリーの数値を表で見る</summary><div id="overview-table" class="table-scroll"></div></details>
+    </section>
+    <section class="metrics" aria-label="選択月のサマリー">
+      <article class="metric"><p>月間セッション数 <span id="selected-period"></span></p><div id="session-total" class="metric-value">—</div><small id="total-note">日別セッションの合計</small></article>
+      <article class="metric"><p>前月比</p><div id="previous-change" class="metric-value">—</div><small id="previous-note">比較データなし</small></article>
+      <article class="metric"><p>前年同月比</p><div id="year-change" class="metric-value">—</div><small id="year-note">比較データなし</small></article>
+    </section>
+    <section class="panel" aria-labelledby="monthly-title">
+      <div class="panel-heading"><div><p class="eyebrow">MONTHLY SESSIONS</p><h2 id="monthly-title">月別セッション数</h2></div><span class="unit">セッション</span></div>
+      <p id="monthly-note" class="chart-note">棒を選ぶと、その月の詳細に切り替わります。</p>
+      <p id="monthly-empty" class="empty" hidden></p>
+      <div class="chart-wrap"><canvas id="monthly-chart" role="img" aria-label="月別セッション数。数値は下のデータ表で確認できます。"></canvas></div>
+      <details><summary>数値を表で見る・月を選ぶ</summary><div id="monthly-table" class="table-scroll"></div></details>
+    </section>
+    <div class="two-columns">
+      <section class="panel" aria-labelledby="country-title">
+        <div class="panel-heading"><div><p class="eyebrow">COUNTRIES</p><h2 id="country-title">国別アクティブユーザー数</h2></div><span class="unit">人</span></div>
+        <p class="chart-note">選択月・人数の多い順</p><p id="country-empty" class="empty" hidden></p>
+        <div class="chart-wrap horizontal"><canvas id="country-chart" role="img" aria-label="国別アクティブユーザー数。数値は下のデータ表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="country-table" class="table-scroll"></div></details>
+      </section>
+      <section class="panel" aria-labelledby="channel-title">
+        <div class="panel-heading"><div><p class="eyebrow">CHANNELS</p><h2 id="channel-title">流入元別アクティブユーザー数</h2></div><span class="unit">人</span></div>
+        <p class="chart-note">選択月・同じユーザーが複数の流入元に含まれる場合があります</p><p id="channel-empty" class="empty" hidden></p>
+        <div class="chart-wrap horizontal"><canvas id="channel-chart" role="img" aria-label="流入元別アクティブユーザー数。数値は下のデータ表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="channel-table" class="table-scroll"></div></details>
+      </section>
+    </div>
+    <section class="panel" aria-labelledby="pages-title">
+      <div class="panel-heading"><div><p class="eyebrow">TOP PAGES</p><h2 id="pages-title">人気ページ TOP5</h2></div><span class="unit">PV</span></div>
+      <p class="chart-note">選択月の上位ページ。サイト全体のPVではありません。</p><p id="pages-empty" class="empty" hidden></p>
+      <div class="chart-wrap pages-chart"><canvas id="pages-chart" role="img" aria-label="人気ページ上位5件のPV。記事のタイトルとリンクは下の表で確認できます。"></canvas></div>
+      <div id="pages-table" class="table-scroll page-list"></div>
+    </section>
+    <section class="panel" aria-labelledby="landing-title">
+      <div class="panel-heading"><div><p class="eyebrow">LANDING PAGES</p><h2 id="landing-title">入口ページ TOP10</h2></div><span class="unit">セッション</span></div>
+      <p id="landing-note" class="chart-note">選択月に最初に訪問されたページ。棒はセッション数、表にはエンゲージメント率も表示します。</p>
+      <p id="landing-empty" class="empty" hidden></p>
+      <div class="chart-wrap landing-chart"><canvas id="landing-chart" role="img" aria-label="入口ページ上位10件のセッション数。記事リンクとエンゲージメント率は下の表で確認できます。"></canvas></div>
+      <div id="landing-table" class="table-scroll page-list landing-list"></div>
+    </section>
+    <section class="panel" aria-labelledby="daily-title">
+      <div class="panel-heading"><div><p class="eyebrow">DAILY SESSIONS</p><h2 id="daily-title">日別セッション数</h2></div><span class="unit">セッション</span></div>
+      <p id="daily-note" class="chart-note">選択月の1日〜末日</p><p id="daily-empty" class="empty" hidden></p>
+      <div class="chart-wrap"><canvas id="daily-chart" role="img" aria-label="日別セッション数。数値は下のデータ表で確認できます。"></canvas></div>
+      <details><summary>数値を表で見る</summary><div id="daily-table" class="table-scroll"></div></details>
+    </section>
+    <footer><span>ナストンのまとめ / アクセス解析</span><p>セッション数・アクティブユーザー数・PVはそれぞれ異なる指標です。国別・流入元別の人数は、合算して全体人数にはしません。</p></footer>
+  </main>
+</body>
+</html>
