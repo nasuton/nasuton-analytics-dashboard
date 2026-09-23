@@ -1,10 +1,10 @@
-import { loadData } from './data-source.js';
-import { dataConfig } from './config.js';
+import { loadData, loadMonthDetails, clearDataCache, detailKeys, requestPeriods } from './data-source.js';
 import { number, availablePeriods, monthStats, comparison, dailyPoints, safePageUrl, overviewMetrics, overviewSeries, formatMetric } from './model.js';
 import { colors, drawBars, clearChart } from './charts.js';
 
 const $ = id => document.getElementById(id);
 let data = { daily: [], country: [], channel: [], pages: [], overview: [], landing: [] }, errors = {}, periods = [], selected = '';
+let busy = false;
 const names = { daily: '日別セッション', country: '国別アクティブユーザー', channel: '流入元別アクティブユーザー', pages: '人気ページ', overview: '月次サマリー', landing: '入口ページ' };
 const channelColors = { Direct: '#6891a4', 'Organic Search': '#287767', 'Organic Social': '#bba35d', Referral: '#849b73', Unassigned: '#a3aaa7', 'AI Assistant': '#9982af' };
 const monthLabel = period => `${period.slice(0, 4)}年${Number(period.slice(5))}月`;
@@ -20,11 +20,34 @@ function syncSelectors() {
   $('month').value = selected.slice(5);
   $('year').disabled = $('month').disabled = !periods.length;
 }
-function choosePeriod(period) {
-  if (!periods.includes(period)) return;
+function setBusy(value) {
+  busy = value;
+  $('reload').disabled = value;
+  $('overview-metric').disabled = value;
+  $('main').setAttribute('aria-busy', String(value));
+  $('year').disabled = $('month').disabled = value || !periods.length;
+}
+function showStatus() {
+  const messages = Object.entries(errors).map(([kind, message]) => `${names[kind]}：${message}`);
+  if (!periods.length) messages.unshift('表示できるデータがありません。APIの取得先と応答を確認してください。');
+  if (!globalThis.Chart) messages.push('グラフライブラリを読み込めません。数値は表で確認できます。');
+  $('status').textContent = messages.join('\n'); $('status').hidden = !messages.length;
+}
+async function fetchDetails() {
+  const result = await loadMonthDetails(selected);
+  Object.assign(data, result.data);
+  for (const key of detailKeys) delete errors[key];
+  Object.assign(errors, result.errors);
+}
+async function choosePeriod(period) {
+  if (busy || !periods.includes(period)) return;
   selected = period;
   syncSelectors();
-  render();
+  setBusy(true);
+  $('status').hidden = false;
+  $('status').textContent = `${monthLabel(period)}のデータをAPIから取得しています…`;
+  try { await fetchDetails(); render(); showStatus(); }
+  finally { setBusy(false); }
 }
 function table(id, headers, rows) {
   const node = document.createElement('table');
@@ -164,24 +187,27 @@ function render() {
 }
 
 async function reload() {
-  $('reload').disabled = $('year').disabled = $('month').disabled = true;
+  if (busy) return;
+  setBusy(true);
+  clearDataCache();
   $('status').hidden = false;
-  $('status').textContent = 'データを読み込んでいます…';
+  $('status').textContent = '年間グラフと前年比較用の履歴を、APIから月ごとに取得しています…';
   try {
     ({ data, errors } = await loadData());
     periods = availablePeriods(data);
+    if (!periods.length && Object.keys(errors).length) periods = requestPeriods();
     if (!periods.includes(selected)) selected = periods.at(-1) ?? '';
-    $('coverage').textContent = periods.length ? `収録期間 ${monthLabel(periods[0])} — ${monthLabel(periods.at(-1))}` : 'データ未配置';
+    const actualPeriods = availablePeriods(data);
+    $('coverage').textContent = actualPeriods.length ? `収録期間 ${monthLabel(actualPeriods[0])} — ${monthLabel(actualPeriods.at(-1))}` : 'APIのデータ未取得';
     syncSelectors();
-    const messages = Object.entries(errors).map(([kind, message]) => `${names[kind]}：${message}`);
-    if (!periods.length) messages.unshift(dataConfig.mode === 'files' ? 'dataフォルダーにJSONファイルを配置し、「再読み込み」を押してください。' : '表示できるデータがありません。APIの取得先と応答を確認してください。');
-    if (!globalThis.Chart) messages.push('グラフライブラリを読み込めません。vendor/chart.umd.min.js の配置を確認してください。数値は表で確認できます。');
-    $('status').textContent = messages.join('\n'); $('status').hidden = !messages.length;
+    setBusy(true);
+    if (selected) await fetchDetails();
+    showStatus();
     render();
   } catch (error) {
     $('status').hidden = false;
     $('status').textContent = `表示を更新できませんでした。${error.message}`;
-  } finally { $('reload').disabled = false; }
+  } finally { setBusy(false); }
 }
 $('year').addEventListener('change', () => {
   const options = periods.filter(period => period.startsWith($('year').value));

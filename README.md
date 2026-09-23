@@ -1,83 +1,87 @@
 # ナストン アクセス解析
 
-GitHub Pages向けの静的ダッシュボードです。HTML / CSS / JavaScriptとChart.jsを使用します。ビルド不要で、実データやAPIキーは同梱していません。
+GitHub Pagesで動作する静的ダッシュボードです。HTML / CSS / JavaScript / Chart.jsを使用し、表示データはブラウザーからAPIへGETリクエストして取得します。ビルド・npm installは不要です。
 
-## JSONを配置する
+## ローカル起動
 
-次の6ファイルを `data/` へ置いてください。ファイル名・大文字小文字・項目名は以下の通りです。UTF-8のJSON配列を読み込みます。
-
-| ファイル | 項目 | 指標 |
-| --- | --- | --- |
-| DailySessions.json | SessionDate, SessionCount | 日別セッション数 |
-| MonthlyCountryAccess.json | MonthYear, Country, AccessCount | 国別アクティブユーザー数 |
-| MonthlySessionDefaultChannelGroupAccess.json | MonthYear, SessionDefaultChannelGroup, AccessCount | 流入元別アクティブユーザー数 |
-| MonthlyTopPages.json | MonthYear, Rank, PageTitle, PageURL, PageViews | 月別の人気ページTOP5・PV |
-| MonthlyOverview.json | MonthYear, ActiveUsers, ScreenPageViews, NewUsers, EngagementRate | 月ごとの全体ユーザー数・総PV・新規ユーザー数・エンゲージメント率 |
-| MonthlyLandingPages.json | MonthYear, Rank, PageTitle, PageURL, Sessions, EngagementRate | 月別の入口ページTOP10・セッション数・エンゲージメント率 |
-
-`SessionDate` は `2026-08-01`、`MonthYear` は `2026-08` の形式、件数・順位はJSONの数値です。未取得の行は含めず、実績が0の場合は0を入れます。日付重複、負数、不正な日付などは読み込みエラーとして表示します。
-
-`EngagementRate` は0〜1の数値を指定します（例：`0.473684` → 画面で `47.4%`）。`MonthlyOverview` は1か月につき1行、入口ページは同じ月・順位の重複を避けます。同じURLが別順位で含まれる場合は、合算や再順位付けをせず取得元どおりに表示し、画面に注記します。提供データにはこのケースがあるため、集計元で区分・URL加工の条件を確認してください。
-
-## ローカルで起動する
-
-Node.js 20以降を使用します。外部パッケージのインストールは不要です。
+Node.js 20以降で実行します。
 
 ```powershell
 cd D:\work\javascript\nasuton-analytics-dashboard
 npm run dev
 ```
 
-ブラウザーで http://127.0.0.1:4173 を開きます。終了はターミナルで Ctrl+C。`index.html` の直接ダブルクリックではブラウザーの制限でJSONを取得できないため、HTTPサーバーを使用してください。
+http://127.0.0.1:4173 を開きます。API通信が必要なためインターネット接続が必要です。終了は Ctrl+C。
 
-JSON未配置時は案内を表示します。配置後は「再読み込み」を押してください。一部のファイルだけ読み込めない場合も、他のグラフは利用できます。ファイル取得は15秒でタイムアウトします。
+## API設定
 
-## 画面と集計
+`js/config.js` に取得先・取得開始月・タイムゾーン・通信タイムアウトを設定しています。
 
-- 初期表示はデータに含まれる最新月。対象年・対象月を共通で選択します。
-- 月次サマリーには選択月の総PV・アクティブユーザー数・新規ユーザー数・エンゲージメント率を表示します。グラフの指標を選ぶと、選択年の1〜12月の棒グラフに切り替わります。エンゲージメント率の軸は0〜100%です。未取得の月は0に置き換えません。
-- サマリーの人数・率はJSONの月単位の値をそのまま使用し、年間合計や単純平均にはしません。月の収録日数はこのJSONに含まれないため、月次の完全性は判定していません。
-- 入口ページTOP10はRank順でセッション数を横棒表示し、表とツールチップにはエンゲージメント率も表示します。TOP10の合計をサイト全体のセッション数にはしません。
-- 月別セッションは日別データから合計します。棒またはデータ表のボタンで月を選べます。
-- 月間セッション、前月比、前年同月比を表示します。比較率は両月の全日分が揃い、比較元が0でない場合のみ算出します。
-- 部分的な月の合計には注記を付け、月別グラフでは黄土色で示します。例：2024年4月は16日からのデータ。
-- 国別・流入元別はアクティブユーザー数です。分類を合算してサイト全体の人数にはしません。月の人数を合計して年間人数にも変換しません。
-- 人気ページはRank順の上位5件で、PVと記事リンクを表示します。圏外ページのPVは算出しません。サイト全体のPVは、別途MonthlyOverviewのScreenPageViewsを使用します。
-- 日別グラフは選択月の末日まで表示。未取得は空欄（内部ではnull）、実績ゼロは0。土日を淡い色で示します。
-- グラフには数値表も用意しています。記事リンクはHTTP/HTTPSのみ有効です。
-- データ更新日時はJSONに含まれていないため、画面では収録期間を表示します。
+| 種類 | URL（https://nasuton.com/analytics/api 配下） | 応答の項目 |
+| --- | --- | --- |
+| 日別セッション | /sessions/daily | SessionDate, SessionCount |
+| 国別ユーザー | /users/countries | MonthYear, Country, AccessCount |
+| 流入元別ユーザー | /users/channels | MonthYear, SessionDefaultChannelGroup, AccessCount |
+| 人気ページ | /pages/top | MonthYear, Rank, PageTitle, PageURL, PageViews |
+| 月次サマリー | /overview/monthly | MonthYear, ActiveUsers, ScreenPageViews, NewUsers, EngagementRate |
+| 入口ページ | /pages/landing | MonthYear, Rank, PageTitle, PageURL, Sessions, EngagementRate |
 
-## GitHub Pagesへ配置する
+応答はJSON配列です。AccessCountはactiveUsers、EngagementRateは0〜1（0.473684なら47.4%）の数値として扱います。
 
-1. このフォルダーの内容をGitHubリポジトリのルートへ登録します。`index.html` と同じ階層に `css/`, `js/`, `vendor/`, `data/` を配置します。
-2. 表示したい6つのJSONも `data/` に登録します。
-3. リポジトリの **Settings → Pages → Build and deployment** で **Deploy from a branch** を選択し、使用するブランチの **/(root)** を指定して保存します。
-4. デプロイ完了後、PagesのURLを開きます。
-
-相対URLを使用しているため `https://<owner>.github.io/nasuton-analytics-dashboard/` のようなリポジトリ配下でも動作します。`.nojekyll` を同梱しています。公開PagesのJSONは閲覧者が取得できます。公開可能な集計データだけを置いてください。
-
-この初期設定ではGitリポジトリの初期化、push、GitHub Pagesの公開操作は行っていません。
-
-## 将来APIへ切り替える
-
-`js/config.js` の `mode` を `'api'` にして、`api` の6つのURLを設定します。各APIは現在のJSONと同じ配列・項目名を返す想定です。取得条件はまず全期間を想定しており、年月の絞り込みはブラウザー側で行います。
-
-応答形式が `{ data: [...] }` の場合などは `js/data-source.js` で取り出します。グラフ描画や集計は独立しているので変更不要です。別ドメインのAPIはPagesのオリジンからのCORSを許可してください。SQLの接続情報や秘密のAPIキーはフロントエンドに置かず、API側で管理します。
-
-## ファイル構成
+全APIに、同じ月の月初・月末のパラメーターを付けます。
 
 ```text
-index.html           画面
-css/style.css        スタイル・レスポンシブ対応
-js/config.js         JSON/APIの取得先
-js/data-source.js    取得・検証・エラー処理
-js/model.js          月次集計・比較率・日付処理
-js/charts.js         棒グラフの共通描画
-js/app.js            年月選択・画面更新
-data/                JSON配置先
-vendor/              Chart.js 4.5.1 とライセンス
-scripts/serve.mjs    ローカル確認用サーバー
-test/model.test.js   集計の検証
+?startDate=2026-08-01&endDate=2026-08-31
 ```
 
-`npm test` で欠損日・うるう年・部分月・比較率・重複検証などを確認します。Chart.jsはMITライセンスで、配布物を `vendor/` に同梱しています（実行時のCDN接続は不要）。
+複数月を1回で指定するとAPIがinvalid_periodを返すため、月別に取得します。認証ヘッダー・Cookieは送信しません。秘密鍵・APIキーをブラウザーに埋め込まないでください。
+
+### 取得とキャッシュ
+
+- 初回は日別セッションと月次サマリーを、取得開始月（初期値2024-04）から日本時間の当月まで取得します。当月もAPIの仕様に従って月末を指定します。
+- 国別・流入元別・人気ページ・入口ページは、画面で選択した月だけ取得します。
+- 同時リクエストは最大4件。取得成功した月は画面を開いている間だけメモリーに保持し、同じ月の再選択では再通信しません。
+- 「再読み込み」でキャッシュを破棄し、最新データを取得します。JSONファイルへのフォールバックはありません。
+- 1リクエストのタイムアウトは15秒です。履歴の一部が取得失敗した種類は、欠けた合計や前年比を出さないよう表示を保留します。他の種類は独立して表示できます。
+- 空配列は正常な「データなし」として扱い、初期表示は取得できたデータの最新月にします。
+
+### CORS
+
+API側でブラウザーのOriginを許可してください（パスや末尾のスラッシュは含めません）。
+
+- GitHub Pages: `https://nasuton.github.io`
+- ローカル: `http://127.0.0.1:4173`
+- localhostを使う場合: `http://localhost:4173`も別途許可
+
+画面を独自ドメインや別ポートで開く場合は、そのOriginもAPI側に追加します。ブラウザーでCORS拒否になると、画面側から応答内容を読み取れないことがあります。画面は接続失敗を案内します。
+
+## 画面・集計
+
+- 年月を共通で切り替えます。API取得中は期間操作を無効にして、別の月のデータが混ざることを防ぎます。
+- 月次サマリーは全体PV・アクティブユーザー数・新規ユーザー数・エンゲージメント率のカードと、指標を切り替える年間棒グラフです。人数の年間合算・率の単純平均はしません。
+- 月別セッションと前月比・前年同月比は日別データから計算します。比較対象の両月の全日分が揃い、比較元が0でない場合だけ比較率を出します。
+- 部分月のセッション合計には注記します。月次サマリーには収録日数がないため、その完全性は判定しません。
+- 国別・流入元別はアクティブユーザー数です。分類の合計を全体ユーザー数にはしません。
+- 人気ページは上位5件のPV、入口ページは上位10件のセッション数です。入口ページの表・ツールチップにはエンゲージメント率を併記します。
+- 入口ページに同じURLが別順位で含まれる場合は合算せず、元の順位で表示して注記します。
+- 日別グラフは未取得と0件を区別します。土日は淡い色で表示します。
+- APIの範囲外データ・不正な日付・負数・重複・率の範囲を検証します。ページタイトルはテキストとして表示し、記事リンクはHTTP/HTTPSのみ有効です。
+
+## GitHub Pagesへ公開
+
+1. コードをコミット・プッシュします。`data/` のJSONは表示に使いません。
+2. GitHubの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定します。
+3. `.github/workflows/github-pages.yml` がmainへのpush（またはActions画面の手動実行）で公開します。
+
+公開物はindex.html・favicon・CSS・JavaScript・vendorです。JSONファイルを公開物にコピーする処理は取り除いています。ローカルの既存JSONは削除していません。過去にGitへ登録済みのJSONはリポジトリには残るため、Pagesへの配信除外とGitの履歴削除は別です。
+
+## 構成と検証
+
+- `js/config.js`: API設定
+- `js/data-source.js`: 月別API取得、キャッシュ、並列数制御、エラー処理
+- `js/model.js`: 集計・日付・応答の検証
+- `js/charts.js`: グラフ描画
+- `js/app.js`: 年月選択と画面更新
+- `vendor/`: Chart.js 4.5.1（MITライセンス）
+
+`npm test` で集計・率の換算・APIの月末パラメーター・キャッシュ・失敗時の分離などを確認します。

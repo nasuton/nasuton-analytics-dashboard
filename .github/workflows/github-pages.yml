@@ -35,10 +35,9 @@ jobs:
       - name: Prepare static site
         shell: bash
         run: |
-          mkdir -p _site/data
+          mkdir -p _site
           cp index.html favicon.svg .nojekyll _site/
           cp -R css js vendor _site/
-          cp data/*.json _site/data/
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
