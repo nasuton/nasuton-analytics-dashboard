@@ -186,10 +186,11 @@ function render() {
   table('daily-table', ['日付', 'セッション数'], days.map(day => [day.date, day.value === null ? '未取得' : number.format(day.value)]));
 }
 
-async function reload() {
+// 「再読み込み」ボタンからはキャッシュを破棄して全期間を再取得します。初回表示はsessionStorageの保存分を再利用します。
+async function reload(clearCache = false) {
   if (busy) return;
   setBusy(true);
-  clearDataCache();
+  if (clearCache) clearDataCache();
   $('status').hidden = false;
   $('status').textContent = '年間グラフと前年比較用の履歴を、APIから月ごとに取得しています…';
   try {
@@ -214,8 +215,8 @@ $('year').addEventListener('change', () => {
   choosePeriod(options.find(period => period.slice(5) === selected.slice(5)) ?? options.at(-1));
 });
 $('month').addEventListener('change', () => choosePeriod(`${$('year').value}-${$('month').value}`));
-$('reload').addEventListener('click', reload);
+$('reload').addEventListener('click', () => reload(true));
 $('overview-metric').addEventListener('change', renderOverview);
 // deferの外部ライブラリとmoduleの双方の実行後に描画を開始します。
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reload, { once: true });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => reload(), { once: true });
 else reload();
