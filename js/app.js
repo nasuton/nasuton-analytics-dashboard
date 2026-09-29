@@ -1,5 +1,5 @@
 import { loadData, loadMonthDetails, clearDataCache, detailKeys, requestPeriods } from './data-source.js';
-import { number, availablePeriods, monthStats, comparison, dailyPoints, safePageUrl, overviewMetrics, overviewSeries, formatMetric } from './model.js';
+import { number, availablePeriods, monthStats, comparison, dailyPoints, safePageUrl, overviewMetrics, overviewSeries, formatMetric, monthLabel } from './model.js';
 import { colors, drawBars, clearChart } from './charts.js';
 
 const $ = id => document.getElementById(id);
@@ -7,7 +7,6 @@ let data = { daily: [], country: [], channel: [], pages: [], overview: [], landi
 let busy = false;
 const names = { daily: '日別セッション', country: '国別アクティブユーザー', channel: '流入元別アクティブユーザー', pages: '人気ページ', overview: '月次サマリー', landing: '入口ページ' };
 const channelColors = { Direct: '#6891a4', 'Organic Search': '#287767', 'Organic Social': '#bba35d', Referral: '#849b73', Unassigned: '#a3aaa7', 'AI Assistant': '#9982af' };
-const monthLabel = period => `${period.slice(0, 4)}年${Number(period.slice(5))}月`;
 
 function setOptions(select, values, label) {
   select.replaceChildren(...values.map(value => new Option(label(value), value)));

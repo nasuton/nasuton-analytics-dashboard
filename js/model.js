@@ -63,13 +63,14 @@ export function shiftMonth(period, amount) {
   const date = new Date(Date.UTC(year, month - 1 + amount, 1));
   return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}`;
 }
+export const monthLabel = period => `${period.slice(0, 4)}年${Number(period.slice(5))}月`;
 export function comparison(rows, period, offset) {
   const current = monthStats(rows, period);
   const previousPeriod = shiftMonth(period, offset);
   const previous = monthStats(rows, previousPeriod);
   if (!current.complete || !previous.complete) return { value: null, note: '両月の日次データが揃った場合に表示' };
-  if (previous.total === 0) return { value: null, note: `${previousPeriod}は0セッションのため算出不可` };
-  return { value: (current.total - previous.total) / previous.total * 100, note: `${previousPeriod}：${number.format(previous.total)} セッション` };
+  if (previous.total === 0) return { value: null, note: `${monthLabel(previousPeriod)}は0セッションのため算出不可` };
+  return { value: (current.total - previous.total) / previous.total * 100, note: `${monthLabel(previousPeriod)}：${number.format(previous.total)} セッション` };
 }
 export function dailyPoints(rows, period) {
   const map = new Map(rows.map(row => [row.SessionDate, row.SessionCount]));
