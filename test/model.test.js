@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateRows, daysInMonth, dailyPoints, monthStats, comparison, shiftMonth, availablePeriods, safePageUrl, overviewSeries, formatMetric } from '../js/model.js';
+import { validateRows, daysInMonth, dailyPoints, monthStats, comparison, shiftMonth, monthLabel, availablePeriods, safePageUrl, overviewSeries, formatMetric } from '../js/model.js';
 
 const fullMonth = (period, count) => Array.from({ length: daysInMonth(period) }, (_, i) => ({ SessionDate: `${period}-${String(i + 1).padStart(2, '0')}`, SessionCount: count }));
 test('日付の欠損はnull、実績ゼロは0。うるう年にも対応', () => {
@@ -17,9 +17,14 @@ test('月の一部だけのデータから月間の比較率を出さない', ()
 test('全日分がある場合の前月比・前年同月比とゼロ除算', () => {
   const rows = [...fullMonth('2026-07', 10), ...fullMonth('2026-08', 20), ...fullMonth('2025-08', 40)];
   assert.equal(comparison(rows, '2026-08', -1).value, 100);
+  assert.equal(comparison(rows, '2026-08', -1).note, '2026年7月：310 セッション');
   assert.equal(comparison(rows, '2026-08', -12).value, -50);
+  assert.equal(comparison(rows, '2026-08', -12).note, '2025年8月：1,240 セッション');
   assert.equal(comparison([...fullMonth('2026-07', 0), ...fullMonth('2026-08', 1)], '2026-08', -1).value, null);
+  assert.equal(comparison([...fullMonth('2026-07', 0), ...fullMonth('2026-08', 1)], '2026-08', -1).note, '2026年7月は0セッションのため算出不可');
   assert.equal(shiftMonth('2026-01', -1), '2025-12');
+  assert.equal(monthLabel('2025-12'), '2025年12月');
+  assert.equal(monthLabel('2026-01'), '2026年1月');
 });
 test('不正な日付・件数・日付重複を拒否', () => {
   assert.throws(() => validateRows('daily', [{ SessionDate: '2026-02-30', SessionCount: 1 }]));

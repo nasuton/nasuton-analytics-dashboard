@@ -28,6 +28,15 @@ jobs:
         with:
           persist-credentials: false
 
+      # 依存パッケージは無いため npm install は不要。テスト失敗時はデプロイしません。
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run tests
+        run: npm test
+
       # GitHubの Settings > Pages > Source を GitHub Actions に設定します。
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

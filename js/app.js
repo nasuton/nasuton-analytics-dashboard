@@ -1,5 +1,5 @@
 import { loadData, loadMonthDetails, clearDataCache, detailKeys, requestPeriods } from './data-source.js';
-import { number, availablePeriods, monthStats, comparison, dailyPoints, safePageUrl, overviewMetrics, overviewSeries, formatMetric } from './model.js';
+import { number, availablePeriods, monthStats, comparison, dailyPoints, safePageUrl, overviewMetrics, overviewSeries, formatMetric, monthLabel } from './model.js';
 import { colors, drawBars, clearChart } from './charts.js';
 
 const $ = id => document.getElementById(id);
@@ -7,7 +7,6 @@ let data = { daily: [], country: [], channel: [], pages: [], overview: [], landi
 let busy = false;
 const names = { daily: '日別セッション', country: '国別アクティブユーザー', channel: '流入元別アクティブユーザー', pages: '人気ページ', overview: '月次サマリー', landing: '入口ページ' };
 const channelColors = { Direct: '#6891a4', 'Organic Search': '#287767', 'Organic Social': '#bba35d', Referral: '#849b73', Unassigned: '#a3aaa7', 'AI Assistant': '#9982af' };
-const monthLabel = period => `${period.slice(0, 4)}年${Number(period.slice(5))}月`;
 
 function setOptions(select, values, label) {
   select.replaceChildren(...values.map(value => new Option(label(value), value)));
@@ -186,10 +185,11 @@ function render() {
   table('daily-table', ['日付', 'セッション数'], days.map(day => [day.date, day.value === null ? '未取得' : number.format(day.value)]));
 }
 
-async function reload() {
+// 「再読み込み」ボタンからはキャッシュを破棄して全期間を再取得します。初回表示はsessionStorageの保存分を再利用します。
+async function reload(clearCache = false) {
   if (busy) return;
   setBusy(true);
-  clearDataCache();
+  if (clearCache) clearDataCache();
   $('status').hidden = false;
   $('status').textContent = '年間グラフと前年比較用の履歴を、APIから月ごとに取得しています…';
   try {
@@ -214,8 +214,8 @@ $('year').addEventListener('change', () => {
   choosePeriod(options.find(period => period.slice(5) === selected.slice(5)) ?? options.at(-1));
 });
 $('month').addEventListener('change', () => choosePeriod(`${$('year').value}-${$('month').value}`));
-$('reload').addEventListener('click', reload);
+$('reload').addEventListener('click', () => reload(true));
 $('overview-metric').addEventListener('change', renderOverview);
 // deferの外部ライブラリとmoduleの双方の実行後に描画を開始します。
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', reload, { once: true });
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => reload(), { once: true });
 else reload();
