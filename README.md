@@ -34,7 +34,7 @@ http://127.0.0.1:4173 を開きます。API通信が必要なためインター�
 ?startDate=2026-08-01&endDate=2026-08-31
 ```
 
-複数月を1回で指定するとAPIがinvalid_periodを返すため、月別に取得します。認証ヘッダー・Cookieは送信しません。秘密鍵・APIキーをブラウザーに埋め込まないでください。
+複数月を1回で指定するとAPIがinvalid_periodを返すため、月別に取得します。認証ヘッダー・Cookieは送信しません。秘密鍵・APIキーをブラウザーに埋め込まないでください。JSONファイルへのフォールバックはありません。
 
 ### 取得とキャッシュ
 
@@ -71,11 +71,11 @@ API側でブラウザーのOriginを許可してください（パスや末尾�
 
 ## GitHub Pagesへ公開
 
-1. コードをコミット・プッシュします。`data/` のJSONは表示に使いません。
+1. コードをコミット・プッシュします。
 2. GitHubの **Settings → Pages → Build and deployment → Source** を **GitHub Actions** に設定します。
-3. `.github/workflows/github-pages.yml` がmainへのpush（またはActions画面の手動実行）で公開します。
+3. `.github/workflows/github-pages.yml` がmainへのpush（またはActions画面の手動実行）で、`npm test` の成功後に公開します。
 
-公開物はindex.html・favicon・CSS・JavaScript・vendorです。JSONファイルを公開物にコピーする処理は取り除いています。ローカルの既存JSONは削除していません。過去にGitへ登録済みのJSONはリポジトリには残るため、Pagesへの配信除外とGitの履歴削除は別です。
+公開物はindex.html・favicon・CSS・JavaScript・vendorです。表示データはすべてAPIから取得し、リポジトリにJSONデータは含みません。
 
 ## 構成と検証
 
