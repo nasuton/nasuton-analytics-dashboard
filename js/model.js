@@ -9,8 +9,48 @@ export function isPeriod(value) {
 export function isDate(value) {
   return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && isPeriod(value.slice(0, 7)) && Number(value.slice(8)) >= 1 && Number(value.slice(8)) <= daysInMonth(value.slice(0, 7));
 }
+const extendedReports = {
+  device: { categories: ['DeviceCategory'], counts: ['ActiveUsers'], nullableCounts: ['Sessions', 'ScreenPageViews'] },
+  browser: { categories: ['Browser'], counts: ['ActiveUsers'], nullableCounts: ['Sessions', 'ScreenPageViews'] },
+  os: { categories: ['OperatingSystem'], counts: ['ActiveUsers'], nullableCounts: ['Sessions', 'ScreenPageViews'] },
+  traffic: { categories: ['SessionSource', 'SessionMedium'], counts: ['Sessions'], nullableCounts: ['ActiveUsers'] },
+  article: { categories: ['PageURL'], counts: ['PageViews'], nullableCounts: ['PreviousMonthPageViews'] },
+  search: { categories: ['SiteURL', 'SearchType', 'QueryText'], counts: ['Clicks', 'Impressions'], nullableCounts: [] },
+};
+const isCount = value => Number.isSafeInteger(value) && value >= 0;
+function validateExtendedRows(kind, rows) {
+  const schema = extendedReports[kind], unique = new Set(), ranks = new Set();
+  rows.forEach((row, i) => {
+    const fail = () => { throw new Error(`${i + 1}行目の項目・日付・数値、または重複を確認してください。`); };
+    if (!row || !isPeriod(row.MonthYear)) fail();
+    if (schema.categories.some(field => typeof row[field] !== 'string' || !row[field].trim())) fail();
+    if (schema.counts.some(field => !isCount(row[field]))) fail();
+    if (schema.nullableCounts.some(field => row[field] !== null && !isCount(row[field]))) fail();
+    if (kind === 'article') {
+      if (row.PageTitle !== null && typeof row.PageTitle !== 'string') fail();
+      if (!Number.isSafeInteger(row.Rank) || row.Rank < 1) fail();
+      const rank = JSON.stringify([row.MonthYear, row.Rank]);
+      if (ranks.has(rank)) fail();
+      ranks.add(rank);
+    }
+    if (kind === 'search') {
+      if (!['web', 'image', 'video', 'news'].includes(row.SearchType) || row.Clicks > row.Impressions) fail();
+      if (row.Impressions === 0) {
+        if (row.CTR !== null || row.AveragePosition !== null) fail();
+      } else {
+        if (!Number.isFinite(row.CTR) || row.CTR < 0 || row.CTR > 1 || Math.abs(row.CTR - row.Clicks / row.Impressions) > 1e-9) fail();
+        if (!Number.isFinite(row.AveragePosition) || row.AveragePosition < 1) fail();
+      }
+    }
+    const key = JSON.stringify([row.MonthYear, ...schema.categories.map(field => row[field])]);
+    if (unique.has(key)) fail();
+    unique.add(key);
+  });
+  return rows;
+}
 export function validateRows(kind, rows) {
   if (!Array.isArray(rows)) throw new Error('JSONの最上位は配列にしてください。');
+  if (extendedReports[kind]) return validateExtendedRows(kind, rows);
   const unique = new Set();
   const countFields = { daily: ['SessionCount'], pages: ['PageViews'], country: ['AccessCount'], channel: ['AccessCount'], overview: ['ActiveUsers', 'ScreenPageViews', 'NewUsers'], landing: ['Sessions'] }[kind];
   if (!countFields) throw new Error('未対応のデータ種別です。');
@@ -30,6 +70,11 @@ export function validateRows(kind, rows) {
     unique.add(key);
   });
   return rows;
+}
+export function pageViewComparison(row) {
+  const previous = row.PreviousMonthPageViews;
+  if (previous === null) return { change: null, percent: null };
+  return { change: row.PageViews - previous, percent: previous === 0 ? null : (row.PageViews - previous) / previous * 100 };
 }
 export const overviewMetrics = {
   ScreenPageViews: { label: '総PV', unit: 'PV' },

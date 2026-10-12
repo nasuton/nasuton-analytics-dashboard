@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { dataConfig } from '../js/config.js';
-import { buildApiUrl, requestPeriods, volatilePeriods, loadData, loadMonthDetails, clearDataCache } from '../js/data-source.js';
+import { buildApiUrl, requestPeriods, volatilePeriods, loadData, loadMonthDetails, clearDataCache, detailKeys } from '../js/data-source.js';
 
 // NodeにはsessionStorageが無いため、Web Storage互換のメモリー実装を差し込みます。
 function memoryStorage(map = new Map()) {
@@ -68,10 +68,10 @@ test('APIの取得期間・キャッシュ・失敗時の分離', async t => {
     assert.equal(result.data.overview.length, 5);
     assert.equal(calls.length, 10);
     assert.ok(max <= 4);
-    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 14);
-    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 14);
-    await loadMonthDetails('2026-07', now); assert.equal(calls.length, 18);
-    clearDataCache(); await loadMonthDetails('2026-08', now); assert.equal(calls.length, 22);
+    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 10 + detailKeys.length);
+    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 10 + detailKeys.length);
+    await loadMonthDetails('2026-07', now); assert.equal(calls.length, 10 + detailKeys.length * 2);
+    clearDataCache(); await loadMonthDetails('2026-08', now); assert.equal(calls.length, 10 + detailKeys.length * 3);
   });
   await t.test('過去月はsessionStorageから復元し、当月・前月は毎回取得。再読み込みで全件破棄', async () => {
     dataConfig.startMonth = '2026-05'; clearDataCache();
@@ -89,11 +89,11 @@ test('APIの取得期間・キャッシュ・失敗時の分離', async t => {
     assert.equal(result.data.daily.length, 4);
     assert.deepEqual(calls.map(monthOf).sort(), ['2026-07', '2026-07', '2026-08', '2026-08']);
     calls.length = 0;
-    await loadMonthDetails('2026-06', now); assert.equal(calls.length, 4);
-    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 8);
+    await loadMonthDetails('2026-06', now); assert.equal(calls.length, detailKeys.length);
+    await loadMonthDetails('2026-08', now); assert.equal(calls.length, detailKeys.length * 2);
     reload(); calls.length = 0;
     await loadMonthDetails('2026-06', now); assert.equal(calls.length, 0);
-    await loadMonthDetails('2026-08', now); assert.equal(calls.length, 4);
+    await loadMonthDetails('2026-08', now); assert.equal(calls.length, detailKeys.length);
     clearDataCache(); calls.length = 0;
     assert.equal(store.size, 0);
     await loadData(now); assert.equal(calls.length, 8);
@@ -125,7 +125,7 @@ test('APIの取得期間・キャッシュ・失敗時の分離', async t => {
     globalThis.sessionStorage = undefined;
     assert.deepEqual((await loadData(now)).errors, {});
     await loadMonthDetails('2026-07', now); await loadMonthDetails('2026-07', now);
-    assert.equal(calls.length, 8);
+    assert.equal(calls.length, 4 + detailKeys.length);
     clearDataCache(); calls.length = 0;
     const quotaError = () => { throw new DOMException('quota', 'QuotaExceededError'); };
     globalThis.sessionStorage = { ...memoryStorage(), setItem: quotaError, getItem: quotaError, get length() { return 0; } };

@@ -23,7 +23,7 @@ export function drawBars(id, { labels, values, horizontal = false, backgrounds =
           ticks: { color: '#687873', font: { size: 11 }, padding: 10, maxRotation: 0, autoSkip: true, ...(horizontal ? { precision: 0 } : {}) } },
         y: { beginAtZero: true, ...(percentage && !horizontal ? { max: 100 } : {}), grid: { display: !horizontal, color: '#edf1ed', drawTicks: false }, border: { display: false },
           ticks: { color: '#687873', font: { size: 11 }, padding: 10, autoSkip: false, ...(!horizontal ? { precision: 0 } : {
-            callback(value) { const label = String(this.getLabelForValue(value)); const limit = window.innerWidth <= 520 ? 13 : ['pages', 'landing'].includes(id) ? 30 : 22; return label.length > limit ? `${label.slice(0, limit)}…` : label; },
+            callback(value) { const label = String(this.getLabelForValue(value)); const limit = window.innerWidth <= 520 ? 13 : ['pages', 'landing', 'article'].includes(id) ? 30 : 22; return label.length > limit ? `${label.slice(0, limit)}…` : label; },
           }) } },
       },
     },

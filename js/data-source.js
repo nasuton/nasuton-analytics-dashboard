@@ -1,7 +1,7 @@
 import { dataConfig } from './config.js';
 import { validateRows, daysInMonth, isPeriod, shiftMonth } from './model.js';
 
-export const detailKeys = ['country', 'channel', 'pages', 'landing'];
+export const detailKeys = ['country', 'channel', 'pages', 'landing', 'device', 'browser', 'os', 'traffic', 'article', 'search'];
 const cache = new Map();
 let activeRequests = 0;
 const queue = [];
@@ -30,11 +30,18 @@ export function volatilePeriods(now = new Date()) {
   return [shiftMonth(current, -1), current];
 }
 const storagePrefix = 'analytics:v1:';
-const storageKey = (kind, period) => `${storagePrefix}${kind}:${period}`;
+// 検索プロパティ／検索種別を切り替えた際に、別のデータを再利用しません。
+const cacheKey = (kind, period) => kind === 'search'
+  ? `${kind}:${period}:${JSON.stringify([dataConfig.search.siteURL, dataConfig.search.searchType])}`
+  : `${kind}:${period}`;
+const storageKey = (kind, period) => `${storagePrefix}${cacheKey(kind, period)}`;
 const rowPeriod = (kind, row) => kind === 'daily' ? row.SessionDate.slice(0, 7) : row.MonthYear;
 function checkRows(kind, period, payload) {
   const rows = validateRows(kind, payload);
   if (rows.some(row => rowPeriod(kind, row) !== period)) throw new Error('APIの応答に指定月以外のデータが含まれています。');
+  if (kind === 'search' && rows.some(row => row.SiteURL !== dataConfig.search.siteURL || row.SearchType !== dataConfig.search.searchType)) {
+    throw new Error('APIの応答に指定サイト・検索種別以外のデータが含まれています。');
+  }
   return rows;
 }
 // sessionStorageが使えない環境や容量超過では、メモリーキャッシュだけで動作します。
@@ -67,6 +74,12 @@ export function buildApiUrl(kind, period) {
   const url = new URL(endpoint);
   url.searchParams.set('startDate', `${period}-01`);
   url.searchParams.set('endDate', `${period}-${daysInMonth(period)}`);
+  if (kind === 'search') {
+    const { siteURL, searchType } = dataConfig.search;
+    if (!siteURL || !['web', 'image', 'video', 'news'].includes(searchType)) throw new Error('検索キーワードのサイト・検索種別を確認してください。');
+    url.searchParams.set('siteURL', siteURL);
+    url.searchParams.set('searchType', searchType);
+  }
   return url.href;
 }
 async function fetchMonth(kind, period) {
@@ -92,7 +105,7 @@ async function fetchMonth(kind, period) {
 }
 // 確定済みの過去月だけをsessionStorageにも保存し、リロード後の再取得を省きます。
 function loadMonth(kind, period, persistent) {
-  const key = `${kind}:${period}`;
+  const key = cacheKey(kind, period);
   if (!cache.has(key)) {
     const stored = persistent ? readStored(kind, period) : undefined;
     const request = stored ? Promise.resolve(stored)

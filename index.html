@@ -88,6 +88,44 @@
       <div class="chart-wrap landing-chart"><canvas id="landing-chart" role="img" aria-label="入口ページ上位10件のセッション数。記事リンクとエンゲージメント率は下の表で確認できます。"></canvas></div>
       <div id="landing-table" class="table-scroll page-list landing-list"></div>
     </section>
+    <div class="two-columns extended-reports">
+      <section class="panel" aria-labelledby="device-title">
+        <div class="panel-heading"><div><p class="eyebrow">DEVICES</p><h2 id="device-title">デバイス別アクティブユーザー数</h2></div><span class="unit">人</span></div>
+        <p id="device-note" class="chart-note"></p><p id="device-empty" class="empty" hidden></p>
+        <div class="chart-wrap extended-chart"><canvas id="device-chart" role="img" aria-label="デバイス別ユーザー数。数値は下の表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="device-table" class="table-scroll"></div></details>
+      </section>
+      <section class="panel" aria-labelledby="browser-title">
+        <div class="panel-heading"><div><p class="eyebrow">BROWSERS</p><h2 id="browser-title">ブラウザ別アクティブユーザー数</h2></div><span class="unit">人</span></div>
+        <p id="browser-note" class="chart-note"></p><p id="browser-empty" class="empty" hidden></p>
+        <div class="chart-wrap extended-chart"><canvas id="browser-chart" role="img" aria-label="ブラウザ別ユーザー数。数値は下の表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="browser-table" class="table-scroll"></div></details>
+      </section>
+      <section class="panel" aria-labelledby="os-title">
+        <div class="panel-heading"><div><p class="eyebrow">OPERATING SYSTEMS</p><h2 id="os-title">OS別アクティブユーザー数</h2></div><span class="unit">人</span></div>
+        <p id="os-note" class="chart-note"></p><p id="os-empty" class="empty" hidden></p>
+        <div class="chart-wrap extended-chart"><canvas id="os-chart" role="img" aria-label="OS別ユーザー数。数値は下の表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="os-table" class="table-scroll"></div></details>
+      </section>
+      <section class="panel" aria-labelledby="traffic-title">
+        <div class="panel-heading"><div><p class="eyebrow">TRAFFIC SOURCES</p><h2 id="traffic-title">参照元別セッション数</h2></div><span class="unit">セッション</span></div>
+        <p id="traffic-note" class="chart-note"></p><p id="traffic-empty" class="empty" hidden></p>
+        <div class="chart-wrap extended-chart"><canvas id="traffic-chart" role="img" aria-label="参照元とメディア別セッション数。数値は下の表で確認できます。"></canvas></div>
+        <details><summary>数値を表で見る</summary><div id="traffic-table" class="table-scroll"></div></details>
+      </section>
+    </div>
+    <section class="panel" aria-labelledby="article-title">
+      <div class="panel-heading"><div><p class="eyebrow">PAGE VIEWS</p><h2 id="article-title">記事別PV・前月比</h2></div><span class="unit">PV</span></div>
+      <p id="article-note" class="chart-note"></p><p id="article-empty" class="empty" hidden></p>
+      <div class="chart-wrap extended-chart"><canvas id="article-chart" role="img" aria-label="記事別PV上位10件。記事リンクと前月比は下の表で確認できます。"></canvas></div>
+      <div id="article-table" class="table-scroll page-list article-list"></div>
+    </section>
+    <section class="panel" aria-labelledby="search-title">
+      <div class="panel-heading"><div><p class="eyebrow">SEARCH QUERIES</p><h2 id="search-title">検索キーワード</h2></div><span class="unit">クリック</span></div>
+      <p id="search-note" class="chart-note"></p><p id="search-empty" class="empty" hidden></p>
+      <div class="chart-wrap extended-chart"><canvas id="search-chart" role="img" aria-label="検索キーワード上位10件のクリック数。CTRと平均掲載順位は下の表で確認できます。"></canvas></div>
+      <details><summary>数値を表で見る</summary><div id="search-table" class="table-scroll search-list"></div></details>
+    </section>
     <section class="panel" aria-labelledby="daily-title">
       <div class="panel-heading"><div><p class="eyebrow">DAILY SESSIONS</p><h2 id="daily-title">日別セッション数</h2></div><span class="unit">セッション</span></div>
       <p id="daily-note" class="chart-note">選択月の1日〜末日</p><p id="daily-empty" class="empty" hidden></p>
